@@ -1,0 +1,65 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: safe-travel-mongodb
+    environment:
+      MONGO_INITDB_DATABASE: safe_travel
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - safe-travel-net
+    healthcheck:
+      test: echo 'db.adminCommand("ping")' | mongosh localhost:27017/test
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./server
+    container_name: safe-travel-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - REDALERT_TOKEN=${REDALERT_TOKEN:-pr_TwGtUQvnMgnWbYTRHOnwrGcKuZvDqppALWqwWdoJLSpfvsUYGNiyOfVwWoPBrOdr}
+      - REDALERT_API_URL=${REDALERT_API_URL:-https://redalert.orielhaim.com/api/stats/history}
+      - MONGODB_URL=mongodb://mongodb:27017
+      - SYNC_INTERVAL_MINUTES=5
+    volumes:
+      - ./server:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - safe-travel-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./client
+    container_name: safe-travel-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client/src:/app/src
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    command: npm run dev -- --host
+    depends_on:
+      - backend
+    networks:
+      - safe-travel-net
+
+volumes:
+  mongodb_data:
+
+networks:
+  safe-travel-net:
+    driver: bridge
