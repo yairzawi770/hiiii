@@ -98,6 +98,30 @@ app.add_middleware(
 )
 
 
+# Debug middleware to log all requests
+@app.middleware("http")
+async def log_requests(request, call_next):
+    """Log all incoming requests"""
+    if request.url.path == "/api/trip-risk":
+        try:
+            # Don't consume the body - this prevents Pydantic from reading it!
+            # Just log that we received the request
+            logger.info(f"📨 Incoming {request.method} {request.url.path}")
+        except Exception as e:
+            logger.error(f"Error logging: {e}")
+    
+    try:
+        response = await call_next(request)
+    except Exception as e:
+        print(f"🔴 MIDDLEWARE ERROR before handler: {e}")
+        logger.error(f"🔴 Middleware error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
+    
+    return response
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
@@ -130,15 +154,29 @@ async def calculate_trip_risk(request: TripRequest):
             "metadata": {...}
         }
     """
+    print("=" * 60)
+    print(f"🟢 ENDPOINT HANDLER STARTED")
+    print(f"   Request: {request}")
+    print("=" * 60)
+    
     try:
-        logger.info(f"Calculating trip risk for {len(request.coordinates)} coordinates")
+        logger.info("=" * 50)
+        logger.info(f"📥 POST /api/trip-risk - Received request")
+        logger.info(f"📊 {len(request.coordinates)} coordinates")
+        logger.info(f"⏰ departure_time: {request.departure_time}")
+        logger.info(f"📍 First: {request.coordinates[0] if request.coordinates else 'None'}")
+        
+        print(f"🟢 About to call risk_engine.calculate_trip_risk()")
         trip_risk, segments, checkpoints = await risk_engine.calculate_trip_risk(
             coordinates=request.coordinates,
             departure_time=request.departure_time
         )
+        print(f"🟢 Got result from risk_engine: trip_risk={trip_risk}")
         
-        logger.info(f"Calculated trip risk: {trip_risk:.2%}")
-        return TripRiskResponse(
+        logger.info(f"✅ Calculated trip_risk: {trip_risk:.2%}")
+        logger.info("=" * 50)
+        
+        response = TripRiskResponse(
             trip_risk=trip_risk,
             segments=segments,
             checkpoints=checkpoints,
@@ -147,8 +185,14 @@ async def calculate_trip_risk(request: TripRequest):
                 "departure_time": request.departure_time,
             }
         )
+        print(f"🟢 ENDPOINT HANDLER COMPLETE - returning response")
+        return response
     except Exception as e:
-        logger.error(f"Error calculating trip risk: {e}")
+        print(f"🔴 ENDPOINT HANDLER ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        logger.error(f"❌ Error calculating trip risk: {e}")
+        logger.error(traceback.format_exc())
         raise HTTPException(status_code=400, detail=str(e))
 
 

@@ -1,0 +1,551 @@
+.trip-form-card {
+  width: 100%;
+  background: linear-gradient(155deg, rgba(16, 23, 51, 0.9), rgba(10, 14, 32, 0.86));
+  border: 1px solid rgba(125, 255, 235, 0.25);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow:
+    0 14px 38px rgba(0, 0, 0, 0.42),
+    inset 0 0 35px rgba(0, 255, 204, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.trip-form-card h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1.2rem;
+  letter-spacing: 0.4px;
+  color: #dbffff;
+  text-shadow: 0 0 10px rgba(0, 255, 204, 0.28);
+}
+
+.new-trip-button {
+  justify-self: end;
+  align-self: end;
+  border: 1px solid rgba(125, 255, 235, 0.35);
+  background: rgba(6, 12, 30, 0.55);
+  color: #dbffff;
+  border-radius: 12px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 255, 204, 0.12);
+  transition: transform 140ms ease, background-color 140ms ease, border-color 140ms ease;
+}
+
+.new-trip-button:hover {
+  transform: translateY(-1px);
+  background: rgba(6, 12, 30, 0.72);
+  border-color: rgba(51, 245, 210, 0.6);
+}
+
+.planned-trip-bar {
+  width: min(760px, 100%);
+  padding: 0.7rem 0.8rem;
+  border-radius: 14px;
+  background: linear-gradient(155deg, rgba(16, 23, 51, 0.92), rgba(10, 14, 32, 0.88));
+  border: 1px solid rgba(125, 255, 235, 0.25);
+  box-shadow:
+    0 12px 34px rgba(0, 0, 0, 0.42),
+    inset 0 0 35px rgba(0, 255, 204, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.planned-trip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.55rem;
+}
+
+.risk-panel {
+  border-radius: 16px;
+  padding: 1rem;
+  border: 1px solid rgba(125, 255, 235, 0.2);
+  background: linear-gradient(155deg, rgba(16, 23, 51, 0.92), rgba(10, 14, 32, 0.88));
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.45),
+    inset 0 0 35px rgba(0, 255, 204, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.risk-panel-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #dbffff;
+  margin-bottom: 0.75rem;
+  text-shadow: 0 0 16px rgba(0, 255, 204, 0.25);
+}
+
+.risk-message {
+  border-radius: 12px;
+  padding: 0.85rem 0.9rem;
+  margin-bottom: 0;
+  border: 1px solid rgba(123, 148, 198, 0.35);
+  background: rgba(6, 12, 30, 0.55);
+  color: #e8f3ff;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.risk-scene {
+  position: relative;
+  height: 54px;
+  border-radius: 14px;
+  border: 1px solid rgba(123, 148, 198, 0.25);
+  background: linear-gradient(90deg, rgba(6, 12, 30, 0.75), rgba(12, 20, 44, 0.55));
+  overflow: hidden;
+  direction: ltr;
+}
+
+.risk-road {
+  position: absolute;
+  inset: 0;
+  opacity: 0.9;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.09) 0 0) center / 100% 1px no-repeat,
+    repeating-linear-gradient(
+      90deg,
+      rgba(219, 255, 255, 0.0) 0 18px,
+      rgba(219, 255, 255, 0.16) 18px 26px,
+      rgba(219, 255, 255, 0.0) 26px 44px
+    ) center / 100% 3px no-repeat;
+  filter: drop-shadow(0 0 14px rgba(0, 255, 204, 0.12));
+}
+
+.risk-actor {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.7rem;
+}
+
+.risk-scene .risk-actor.car {
+  font-size: 1.85rem;
+  transform: translateY(-50%) scaleX(-1);
+  will-change: left;
+  animation: riskCarDrive 3.6s linear infinite;
+}
+
+.risk-scene.high .risk-actor.car,
+.risk-scene.extreme .risk-actor.car {
+  font-size: 2.05rem;
+}
+
+.risk-scene.high .risk-actor.missile,
+.risk-scene.extreme .risk-actor.missile {
+  left: auto;
+  right: 18px;
+  top: 10%;
+  transform: translateY(0);
+  animation: riskMissileDiagonal 1.7s ease-in infinite;
+  animation-delay: var(--delay, 0ms);
+}
+
+.missile-emoji {
+  display: inline-block;
+  transform: rotate(-140deg);
+  transform-origin: center;
+}
+
+.risk-scene.medium .risk-actor.megaphone {
+  left: 16px;
+  animation: riskMegaphonePulse 1.05s ease-in-out infinite;
+}
+
+.sound-waves {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: rgba(255, 214, 102, 0);
+}
+
+.risk-scene.medium .sound-waves {
+  animation: soundWaves 1.05s ease-in-out infinite;
+}
+
+.missile-boom {
+  position: absolute;
+  right: 38px;
+  top: 62%;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 111, 132, 0.0);
+}
+
+.risk-scene.high .missile-boom,
+.risk-scene.extreme .missile-boom {
+  animation: riskBoom 1.7s ease-in infinite;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes riskCarDrive {
+  0% {
+    left: -72px;
+  }
+  100% {
+    left: calc(100% + 72px);
+  }
+}
+
+@keyframes riskSirenPulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(255, 214, 102, 0.0));
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(255, 214, 102, 0.35));
+    transform: translateY(-50%) scale(1.08);
+  }
+}
+
+@keyframes riskMegaphonePulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(255, 214, 102, 0.0));
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(255, 214, 102, 0.28));
+    transform: translateY(-50%) scale(1.06);
+  }
+}
+
+@keyframes soundWaves {
+  0%,
+  60% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.2);
+    box-shadow:
+      0 0 0 0 rgba(255, 214, 102, 0.0),
+      0 0 0 0 rgba(255, 214, 102, 0.0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.0);
+    box-shadow:
+      0 0 0 6px rgba(255, 214, 102, 0.18),
+      0 0 0 12px rgba(255, 214, 102, 0.08);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50%) scale(1.2);
+    box-shadow:
+      0 0 0 10px rgba(255, 214, 102, 0.0),
+      0 0 0 18px rgba(255, 214, 102, 0.0);
+  }
+}
+
+@keyframes riskMissileDiagonal {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  10% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+    transform: translate(-220px, 42px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-300px, 62px);
+  }
+}
+
+@keyframes riskBoom {
+  0%,
+  65% {
+    opacity: 0;
+    transform: scale(0.2);
+    background: rgba(255, 111, 132, 0.0);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1.6);
+    background: rgba(255, 111, 132, 0.28);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
+    background: rgba(255, 111, 132, 0.0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .risk-scene .risk-actor.car,
+  .risk-scene.medium .risk-actor.megaphone,
+  .risk-scene.medium .sound-waves,
+  .risk-scene.high .risk-actor.missile,
+  .risk-scene.extreme .risk-actor.missile,
+  .risk-scene.high .missile-boom,
+  .risk-scene.extreme .missile-boom {
+    animation: none;
+  }
+}
+
+.risk-percent-box {
+  width: fit-content;
+  min-width: 86px;
+  padding: 0.4rem 0.6rem;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(123, 148, 198, 0.35);
+  background: rgba(6, 12, 30, 0.65);
+}
+
+.risk-level-title {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #dbffff;
+}
+
+.risk-level-text {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #e8f3ff;
+}
+
+.risk-level-subtext {
+  font-size: 0.93rem;
+  font-weight: 600;
+  color: #a6bde0;
+  line-height: 1.35;
+}
+
+.risk-message.low {
+  border-color: rgba(84, 255, 176, 0.35);
+  box-shadow: 0 10px 25px rgba(84, 255, 176, 0.08);
+}
+
+.risk-message.medium {
+  border-color: rgba(255, 214, 102, 0.35);
+  box-shadow: 0 10px 25px rgba(255, 214, 102, 0.08);
+}
+
+.risk-message.high {
+  border-color: rgba(255, 149, 81, 0.35);
+  box-shadow: 0 10px 25px rgba(255, 149, 81, 0.08);
+}
+
+.risk-message.extreme {
+  border-color: rgba(255, 111, 132, 0.42);
+  box-shadow: 0 10px 25px rgba(255, 111, 132, 0.1);
+}
+
+.risk-message.low .risk-percent-box {
+  border-color: rgba(84, 255, 176, 0.45);
+  background: rgba(0, 255, 204, 0.12);
+  color: #c9fff2;
+}
+
+.risk-message.medium .risk-percent-box {
+  border-color: rgba(255, 214, 102, 0.5);
+  background: rgba(255, 214, 102, 0.12);
+  color: #fff3cc;
+}
+
+.risk-message.high .risk-percent-box {
+  border-color: rgba(255, 149, 81, 0.5);
+  background: rgba(255, 149, 81, 0.12);
+  color: #ffe0cf;
+}
+
+.risk-message.extreme .risk-percent-box {
+  border-color: rgba(255, 111, 132, 0.55);
+  background: rgba(255, 111, 132, 0.12);
+  color: #ffe0e6;
+}
+
+.risk-message.neutral {
+  opacity: 0.9;
+}
+
+.planned-trip-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  color: #dbffff;
+  text-shadow: 0 0 16px rgba(0, 255, 204, 0.35);
+}
+
+.planned-trip-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.7fr 0.7fr;
+  align-items: end;
+  gap: 0.5rem;
+}
+
+.planned-trip-field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.planned-trip-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #a6bde0;
+}
+
+.planned-trip-field input {
+  padding: 0.45rem 0.6rem;
+  font-size: 0.95rem;
+  border: 1px solid rgba(123, 148, 198, 0.45);
+  border-radius: 10px;
+  background: rgba(6, 13, 33, 0.72);
+  color: #f3f8ff;
+}
+
+.planned-trip-field input[readonly] {
+  opacity: 0.95;
+}
+
+@media (max-width: 900px) {
+  .planned-trip-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .planned-trip-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .new-trip-button {
+    width: 100%;
+  }
+}
+
+.trip-form {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.trip-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: #a6bde0;
+}
+
+.autocomplete-field {
+  position: relative;
+}
+
+.trip-form input {
+  border: 1px solid rgba(123, 148, 198, 0.45);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  background: rgba(6, 13, 33, 0.72);
+  color: #f3f8ff;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.trip-form input:focus {
+  outline: none;
+  border-color: #33f5d2;
+  box-shadow: 0 0 0 2px rgba(51, 245, 210, 0.18), 0 0 16px rgba(51, 245, 210, 0.22);
+  background: rgba(8, 17, 40, 0.9);
+}
+
+.trip-form input::placeholder {
+  color: #8aa0c4;
+}
+
+.trip-form input[type='time'] {
+  color-scheme: dark;
+}
+
+.trip-form input[type='time']::-webkit-calendar-picker-indicator {
+  filter: invert(88%) sepia(18%) saturate(620%) hue-rotate(165deg) brightness(105%);
+  opacity: 0.95;
+  cursor: pointer;
+}
+
+.suggestions-list {
+  margin: 0;
+  padding: 0.35rem 0;
+  list-style: none;
+  position: absolute;
+  top: calc(100% + 0.2rem);
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid rgba(105, 220, 255, 0.35);
+  border-radius: 10px;
+  background: rgba(6, 12, 30, 0.96);
+  box-shadow: 0 12px 28px rgba(2, 9, 27, 0.72);
+  z-index: 10;
+}
+
+.suggestion-button {
+  width: 100%;
+  text-align: right;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.95rem;
+  color: #d9ebff;
+}
+
+.suggestion-button:hover {
+  background: linear-gradient(90deg, rgba(49, 243, 207, 0.2), rgba(147, 98, 255, 0.16));
+}
+
+.suggestion-status {
+  padding: 0.45rem 0.75rem;
+  color: #95a9ca;
+  font-size: 0.9rem;
+}
+
+.submit-button {
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1ce5c8, #4b80ff 52%, #915dff);
+  color: #04102b;
+  padding: 0.65rem 0.85rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(66, 147, 255, 0.4);
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+}
+
+.submit-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(66, 147, 255, 0.5);
+  filter: brightness(1.04);
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submit-message {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.submit-message.success {
+  color: #74ffd7;
+}
+
+.submit-message.error {
+  color: #ff8d98;
+}

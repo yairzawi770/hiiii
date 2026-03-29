@@ -93,10 +93,14 @@ class AlarmService:
             }
             headers = {"Authorization": f"Bearer {self.token}"}
             
-            response = await self.client.get(
-                f"{self.base_url}",
-                params=query_params,
-                headers=headers
+            # Add explicit timeout for this specific request
+            response = await asyncio.wait_for(
+                self.client.get(
+                    f"{self.base_url}",
+                    params=query_params,
+                    headers=headers
+                ),
+                timeout=3.0  # 3 second timeout for API call
             )
             response.raise_for_status()
             data = response.json()
@@ -111,6 +115,9 @@ class AlarmService:
                 "raw_data": data,
                 "source": "api"
             }
+        except asyncio.TimeoutError:
+            logger.warning(f"API timeout for ({lat}, {lon})")
+            return None
         except Exception as e:
             logger.error(f"API fetch error: {e}")
             return None

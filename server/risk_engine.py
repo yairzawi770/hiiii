@@ -1,5 +1,6 @@
 import math
 import logging
+import asyncio
 from typing import List, Tuple
 
 from schemas import Point, Segment, CheckpointRisk
@@ -51,6 +52,30 @@ class RiskEngine:
         coordinates: List[Point], 
         departure_time: int
     ) -> Tuple[float, List[Segment], List[CheckpointRisk]]:
+        """Wrapper with timeout protection."""
+        print(f"🟢 RiskEngine: calculate_trip_risk called with {len(coordinates)} coords")
+        try:
+            result = await asyncio.wait_for(
+                self._calculate_trip_risk_impl(coordinates, departure_time),
+                timeout=12.0
+            )
+            print(f"🟢 RiskEngine: Complete - trip_risk={result[0]:.2%}")
+            return result
+        except asyncio.TimeoutError:
+            print(f"🔴 RiskEngine: TIMEOUT after 12 seconds")
+            # Safe fallback
+            return (0.5, [], [])
+        except Exception as e:
+            print(f"🔴 RiskEngine: ERROR - {e}")
+            import traceback
+            traceback.print_exc()
+            return (0.5, [], [])
+    
+    async def _calculate_trip_risk_impl(
+        self, 
+        coordinates: List[Point], 
+        departure_time: int
+    ) -> Tuple[float, List[Segment], List[CheckpointRisk]]:
         """
         Main method: compute overall tripRisk and breakdowns.
         
@@ -69,18 +94,28 @@ class RiskEngine:
             (self._interpolate_point(coordinates, 0.75), "midpoint_75", 0.75),
         ]
         
-        # 2. Query alarm history for each checkpoint
-        checkpoint_risks = []
-        checkpoint_risk_values = []
-        for point, cp_type, _ in checkpoints_data:
-            # Adjust time for each checkpoint (simple: use same time, could add travel duration)
-            alarm_data = await self.alarm_service.get_alarm_history(
+        # 2. Query alarm history for EACH checkpoint in parallel
+        print(f"🟡 RiskEngine: Querying {len(checkpoints_data)} checkpoints in parallel...")
+        checkpoint_tasks = [
+            self.alarm_service.get_alarm_history(
                 lat=point.lat,
                 lon=point.lon,
                 departure_time=departure_time,
                 lookback_days=30
             )
-            alarm_risk = alarm_data.get("risk_score", 0.1) if alarm_data else 0.1
+            for point, cp_type, _ in checkpoints_data
+        ]
+        alarm_datas = await asyncio.gather(*checkpoint_tasks, return_exceptions=True)
+        
+        checkpoint_risks = []
+        checkpoint_risk_values = []
+        for (point, cp_type, _), alarm_data in zip(checkpoints_data, alarm_datas):
+            # Handle exceptions from parallel queries
+            if isinstance(alarm_data, Exception):
+                print(f"🟡 RiskEngine: Query failed for {cp_type}: {alarm_data}")
+                alarm_risk = 0.1
+            else:
+                alarm_risk = alarm_data.get("risk_score", 0.1) if alarm_data else 0.1
             
             checkpoint_risks.append(CheckpointRisk(
                 location=point,
